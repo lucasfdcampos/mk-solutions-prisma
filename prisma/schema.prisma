@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model clients {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name       String   @db.VarChar
+  cpf        String   @unique @db.VarChar
+  cep        String   @db.VarChar
+  adress     String   @db.VarChar
+  city       String   @db.VarChar
+  uf         String   @db.VarChar
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+  avatar     String?  @db.VarChar
+  leads      leads[]
+}
+
+model leads {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  plan_id    String   @db.Uuid
+  user_id    String   @db.Uuid
+  client_id  String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+  clients    clients  @relation(fields: [client_id], references: [id])
+  plans      plans    @relation(fields: [plan_id], references: [id])
+  users      users    @relation(fields: [user_id], references: [id])
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement())
+  timestamp BigInt
+  name      String @db.VarChar
+}
+
+model plans {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name       String   @db.VarChar
+  available  Boolean
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+  leads      leads[]
+}
+
+model users {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name       String   @db.VarChar
+  email      String   @unique @db.VarChar
+  password   String   @db.VarChar
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+  leads      leads[]
+}
